@@ -109,6 +109,56 @@
   word-wrap: break-word; /* Allow long words to wrap */
 }
 
+.chat-send-button {
+  background-color: #0da37f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin-left: 10px; /* Adjust spacing between input and button */
+  cursor: pointer;
+}
+
+.chat-send-button:hover {
+  background-color: #0a8467;
+}
+
+/* Media query for responsiveness */
+@media screen and (max-width: 768px) {
+  .App {
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .sidemenu {
+    width: 100%;
+    padding: 0;
+  }
+
+  .chatbox {
+    flex: 1;
+  }
+
+  .chat-input-holder {
+    padding: 12px;
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+  }
+  
+  .chat-input-textarea {
+    flex: 1;
+  }
+  
+  .chat-send-button {
+    margin-left: 8px; /* Adjust the margin as needed */
+  }
+  
+}
+
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

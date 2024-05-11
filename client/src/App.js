@@ -1,8 +1,6 @@
-// App.js
-
+import React, { useState, useRef, useEffect } from 'react';
 import './normal.css';
 import './App.css';
-import { useState, useRef, useEffect } from 'react';
 
 function App() {
   const initialChatLog = [{
@@ -12,6 +10,8 @@ function App() {
 
   const [input, setInput] = useState("");
   const [chatLog, setChatLog] = useState(initialChatLog);
+  const [isLoading, setIsLoading] = useState(false); // State to track loading state
+  const [isInputEmpty, setIsInputEmpty] = useState(true); // State to track input emptiness
   const chatLogContainerRef = useRef(null);
 
   // Function to clear chats without removing the initial message
@@ -21,8 +21,10 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!input.trim()) return; // Check if input is empty or contains only whitespace
     const newInput = input; // Store the input value before clearing it
     setInput(""); // Clear the input immediately
+    setIsLoading(true); // Set loading state to true
   
     // Add the user's input to the chat log
     setChatLog(prevChatLog => [...prevChatLog, { user: "me", message: newInput }]);
@@ -53,6 +55,8 @@ function App() {
       console.error(error);
       // Add an error message to the chat log if there's an issue with the response
       setChatLog(prevChatLog => [...prevChatLog, { user: "gpt", message: 'Sorry - Something went wrong. Please try again!' }]);
+    } finally {
+      setIsLoading(false); // Set loading state back to false
     }
   };
 
@@ -62,6 +66,11 @@ function App() {
       chatLogContainerRef.current.scrollTop = chatLogContainerRef.current.scrollHeight;
     }
   }, [chatLog]);
+
+  // Update input emptiness state
+  useEffect(() => {
+    setIsInputEmpty(input.trim() === "");
+  }, [input]);
 
   return (
     <div className="App">
@@ -80,13 +89,16 @@ function App() {
           </div>
         </div>
         <div className="chat-input-holder">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="input-group">
             <input
               rows="1"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               className="chat-input-textarea"
             />
+            <button type="submit" className="chat-send-button" disabled={isLoading || isInputEmpty}>
+              {isLoading ? "Sending..." : "Send"}
+            </button>
           </form>
         </div>
       </section>
