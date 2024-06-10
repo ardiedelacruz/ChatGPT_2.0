@@ -1,3 +1,5 @@
+require('dotenv').config(); // Load environment variables from .env file
+
 const axios = require('axios');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -8,7 +10,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Answer of Gemini API to the question.
-let context = {}; 
+let context = {};
 
 // To run the user and Gemini API convo.
 app.post('/', async (req, res) => {
@@ -18,14 +20,14 @@ app.post('/', async (req, res) => {
   try {
     let responseMessage = '';
 
-// Check if there is a response from the Gemini API.
+    // Check if there is a response from the Gemini API.
     if (context[message]) {
-// Retrieve the stored response.
-      responseMessage = context[message]; 
+      // Retrieve the stored response.
+      responseMessage = context[message];
     } else {
-// If no stored response, send the message to ArdsGPT for processing.
+      // If no stored response, send the message to ArdsGPT for processing.
       const response = await axios.post(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyD23zAHTqLWOjGycAzL2IgJauo2yzkgau4',
+        process.env.GEMINI_API_URL, // Use environment variable for API URL
         {
           contents: [{ parts: [{ text: message }] }],
         }
@@ -33,24 +35,28 @@ app.post('/', async (req, res) => {
 
       responseMessage = response.data.candidates[0].content.parts[0].text;
 
-// Store the response in the context for future reference.
+      // Store the response in the context for future reference.
       context[message] = responseMessage;
     }
 
-// Modify the response format to match the expected format.
+    // Modify the response format to match the expected format.
     responseMessage = {
-      answer: responseMessage 
+      answer: responseMessage,
     };
 
     res.json(responseMessage);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Sorry - Something went wrong. Please try again!' });
+    res
+      .status(500)
+      .json({
+        message: 'Sorry - Something went wrong. Please try again!',
+      });
   }
 });
 
 // Check if the server is listening.
-const port = process.env.PORT || 3010; // Default port is 3010
+const port = process.env.PORT || 3010; // Use environment variable for port or default to 3010
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
