@@ -50,7 +50,7 @@ app.post('/', async (req, res) => {
 });
 
 // Check if the server is listening.
-const port = 3010;
+const port = process.env.PORT || 3010; // Default port is 3010
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
