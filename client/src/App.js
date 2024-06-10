@@ -108,7 +108,7 @@ function App() {
 
 const ChatMessage = ({ message }) => {
   const isGPTMessage = message.user === "gpt";
-  
+
   return (
     <div className={`chat-message ${isGPTMessage ? "chatgpt" : ""}`}>
       <div className="chat-message-center">
@@ -120,11 +120,30 @@ const ChatMessage = ({ message }) => {
           </div>
         )}
         <div className="message">
-          {message.message}
+            {message.message.split('\n').map((line, index) => {
+            // Check if the line starts with "**" indicating a bold section
+            if (line.startsWith("**")) {
+              return <strong key={index}>{line.substring(2)}</strong>; // Apply bold formatting
+            }
+            // Check if the line starts with "* " indicating a bullet point
+            else if (line.startsWith("* ")) {
+              return <li key={index}>{line.substring(2)}</li>; // Apply bullet point formatting
+            }
+            // Otherwise, render the line as a paragraph
+            else {
+              return <p key={index}>{line}</p>;
+            }
+          })}
         </div>
       </div>
     </div>
   );
 };
+
+          
+
+
+
+
 
 export default App;

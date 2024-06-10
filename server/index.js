@@ -7,8 +7,10 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-let context = {}; // Initialize context to store previous interactions
+// Answer of Gemini API to the question.
+let context = {}; 
 
+// To run the user and Gemini API convo.
 app.post('/', async (req, res) => {
   const { message } = req.body;
   console.log(message);
@@ -16,11 +18,12 @@ app.post('/', async (req, res) => {
   try {
     let responseMessage = '';
 
-    // Check if there is a stored response in the context related to the user's message
+// Check if there is a response from the Gemini API.
     if (context[message]) {
-      responseMessage = context[message]; // Retrieve the stored response
+// Retrieve the stored response.
+      responseMessage = context[message]; 
     } else {
-      // If no stored response, send the message to ArdsGPT for processing
+// If no stored response, send the message to ArdsGPT for processing.
       const response = await axios.post(
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyD23zAHTqLWOjGycAzL2IgJauo2yzkgau4',
         {
@@ -30,13 +33,13 @@ app.post('/', async (req, res) => {
 
       responseMessage = response.data.candidates[0].content.parts[0].text;
 
-      // Store the response in the context for future reference
+// Store the response in the context for future reference.
       context[message] = responseMessage;
     }
 
-    // Modify the response format to match the expected format
+// Modify the response format to match the expected format.
     responseMessage = {
-      answer: responseMessage // Keeping the answer key as per the original format
+      answer: responseMessage 
     };
 
     res.json(responseMessage);
@@ -46,7 +49,7 @@ app.post('/', async (req, res) => {
   }
 });
 
-
+// Check if the server is listening.
 const port = 3010;
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
