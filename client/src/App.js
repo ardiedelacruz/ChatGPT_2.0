@@ -98,7 +98,7 @@ function App() {
     setIsInputEmpty(input.trim() === "");
   }, [input]);
 
-  // Function to scroll to the top
+  // Scroll to the top
   const scrollToTop = () => {
     if (chatLogContainerRef.current) {
       chatLogContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
