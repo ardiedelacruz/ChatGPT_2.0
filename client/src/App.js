@@ -13,6 +13,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false); // State to track loading state
   const [isInputEmpty, setIsInputEmpty] = useState(true); // State to track input emptiness
   const chatLogContainerRef = useRef(null);
+  const [showScrollButton, setShowScrollButton] = useState(false); // State to track the visibility of the scroll button
 
   // Function to clear chats without removing the initial message
   function clearChat() {
@@ -61,9 +62,34 @@ function App() {
   };
 
   useEffect(() => {
-    // Scroll the chat log container to the bottom whenever the chat log updates
-    if (chatLogContainerRef.current) {
-      chatLogContainerRef.current.scrollTop = chatLogContainerRef.current.scrollHeight;
+    const chatLogContainer = chatLogContainerRef.current;
+
+    const handleScroll = () => {
+      if (chatLogContainer.scrollTop > 100) { // Change '100' to the scroll distance you want
+        setShowScrollButton(true);
+      } else {
+        setShowScrollButton(false);
+      }
+    };
+
+    // Add the scroll event listener
+    if (chatLogContainer) {
+      chatLogContainer.addEventListener('scroll', handleScroll);
+    }
+
+    // Clean up the event listener on component unmount
+    return () => {
+      if (chatLogContainer) {
+        chatLogContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const chatLogContainer = chatLogContainerRef.current;
+    if (chatLogContainer) {
+      // Scroll to the bottom of the chat log
+      chatLogContainer.scrollTop = chatLogContainer.scrollHeight;
     }
   }, [chatLog]);
 
@@ -71,6 +97,14 @@ function App() {
   useEffect(() => {
     setIsInputEmpty(input.trim() === "");
   }, [input]);
+
+  // Function to scroll to the top
+  const scrollToTop = () => {
+    if (chatLogContainerRef.current) {
+      chatLogContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      setShowScrollButton(false); // Hide the button immediately after clicking
+    }
+  };
 
   return (
     <div className="App">
@@ -81,6 +115,11 @@ function App() {
         </div>
       </aside>
       <section className="chatbox">
+        {showScrollButton && (
+          <button className="scroll-to-top" onClick={scrollToTop}>
+            ↑
+          </button>
+        )}
         <div className="chat-log-container" ref={chatLogContainerRef}>
           <div className={`chat-log ${chatLog.length > 0 ? 'reverse' : ''}`}>
             {chatLog.map((message, index) => (
@@ -88,6 +127,7 @@ function App() {
             ))}
           </div>
         </div>
+
         <div className="chat-input-holder">
           <form onSubmit={handleSubmit} className="input-group">
             <input
@@ -139,11 +179,5 @@ const ChatMessage = ({ message }) => {
     </div>
   );
 };
-
-          
-
-
-
-
 
 export default App;
